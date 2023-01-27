@@ -1,2 +1,2 @@
 # Tyme
-A new-gen Discord bot, developed using discord.jar.
+A new-gen Discord bot.
