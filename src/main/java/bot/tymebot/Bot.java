@@ -24,13 +24,14 @@ import java.util.List;
 @Getter
 public class Bot extends DiscordBot {
 
-    @Getter
-    private static final String[] devIds = new String[]{"462296411141177364", "947691195658797167"};
 
     @Getter
     private static Bot instance;
     private final JDA jda;
+    @Getter
     private TymeConfig config = null;
+    @Getter
+    private static String[] devIds;
 
     @Getter
     private static final long startTime = System.currentTimeMillis();
@@ -69,6 +70,11 @@ public class Bot extends DiscordBot {
 
         jda = builder.build().awaitReady();
         initializeCommands(jda);
+
+        // init config
+        config.setDevIds(new String[]{"462296411141177364", "452520883194429440"});
+        saveConfig(file, gson);
+        devIds = config.getDevIds();
     }
 
     @SneakyThrows
@@ -92,4 +98,5 @@ public class Bot extends DiscordBot {
             e.printStackTrace();
         }
     }
+
 }

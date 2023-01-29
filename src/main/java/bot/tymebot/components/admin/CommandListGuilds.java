@@ -10,9 +10,7 @@ public class CommandListGuilds extends SlashCommand {
 
     @Override
     public void onCommand(SlashCommandInteractionEvent slashCommandInteractionEvent) {
-        if (!UtilsUser.isDev(slashCommandInteractionEvent.getUser().getId())) {
-            return;
-        }
+        if (!UtilsUser.isDev(slashCommandInteractionEvent.getUser().getId())) return;
         int guilds = slashCommandInteractionEvent.getJDA().getGuilds().size();
         slashCommandInteractionEvent.reply("I am in " + guilds + (guilds == 1 ? " guild." : " guilds.")).setEphemeral(true).queue();
 

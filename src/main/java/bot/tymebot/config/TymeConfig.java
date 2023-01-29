@@ -10,4 +10,12 @@ public class TymeConfig {
     @SerializedName("token")
     private String botToken;
 
+    @SerializedName("devIds")
+    private String[] devIds;
+
+    @SerializedName("blacklistedUserIds")
+    private String[] blacklistedUserIds;
+
+    @SerializedName("blacklistedGuildIds")
+    private String[] blacklistedGuildIds;
 }

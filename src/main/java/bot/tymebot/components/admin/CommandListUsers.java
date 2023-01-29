@@ -9,9 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 public class CommandListUsers extends SlashCommand {
     @Override
     public void onCommand(SlashCommandInteractionEvent slashCommandInteractionEvent) {
-        if (!UtilsUser.isDev(slashCommandInteractionEvent.getUser().getId())) {
-            return;
-        }
+        if (!UtilsUser.isDev(slashCommandInteractionEvent.getUser().getId())) return;
         int users = slashCommandInteractionEvent.getJDA().getUsers().size();
         slashCommandInteractionEvent.reply("I am currently used by " + users + (users == 1 ? " user." : " users.")).setEphemeral(true).queue();
     }
