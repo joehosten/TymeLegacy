@@ -1,9 +1,11 @@
 package bot.tymebot.core;
 
 import bot.tymebot.Bot;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class Utils {
-    public static String getUptime() {
+    public String getUptime() {
         long uptime = System.currentTimeMillis() - Bot.getStartTime();
         long uptimeSeconds = uptime / 1000;
         long uptimeMinutes = uptimeSeconds / 60;

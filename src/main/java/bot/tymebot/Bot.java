@@ -2,6 +2,7 @@ package bot.tymebot;
 
 import bot.tymebot.components.admin.CommandListGuilds;
 import bot.tymebot.components.admin.CommandListUsers;
+import bot.tymebot.components.guild.ServerJoinListener;
 import bot.tymebot.components.misc.CommandInfo;
 import bot.tymebot.config.TymeConfig;
 import com.google.gson.Gson;
@@ -26,15 +27,14 @@ public class Bot extends DiscordBot {
 
 
     @Getter
+    private static final long startTime = System.currentTimeMillis();
+    @Getter
     private static Bot instance;
+    @Getter
+    private static String[] devIds;
     private final JDA jda;
     @Getter
     private TymeConfig config = null;
-    @Getter
-    private static String[] devIds;
-
-    @Getter
-    private static final long startTime = System.currentTimeMillis();
 
     @SneakyThrows
     public Bot() {
@@ -64,9 +64,13 @@ public class Bot extends DiscordBot {
         builder.setStatus(OnlineStatus.ONLINE);
         builder.setActivity(Activity.watching("over the server!"));
 
+        // commands
         registerGlobalCommand(new CommandListGuilds());
         registerGlobalCommand(new CommandInfo());
         registerGlobalCommand(new CommandListUsers());
+
+        // listeners
+        builder.addEventListeners(new ServerJoinListener());
 
         jda = builder.build().awaitReady();
         initializeCommands(jda);
