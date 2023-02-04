@@ -33,11 +33,12 @@ public class CommandReload extends SlashCommand {
         long start = System.currentTimeMillis();
 
         bot.reloadConfig();
+        bot.getServerManager().reCacheServers();
 
         long end = System.currentTimeMillis();
 
         long diff = Math.abs(end - start);
-        event.reply("Reloaded bot configuration in " + diff + "ms.")
+        event.reply("Reloaded bot configuration & servers in " + diff + "ms.")
                 .setEphemeral(true).queue();
     }
 }

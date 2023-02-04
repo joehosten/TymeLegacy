@@ -24,4 +24,6 @@ public interface ServerManager {
     default void removeServer(@NotNull Guild guild) {
         removeServer(guild.getId());
     }
+
+    void reCacheServers();
 }
