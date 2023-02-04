@@ -5,6 +5,8 @@ import bot.tymebot.components.admin.CommandListUsers;
 import bot.tymebot.components.admin.CommandReload;
 import bot.tymebot.components.guild.ServerJoinListener;
 import bot.tymebot.components.misc.CommandInfo;
+import bot.tymebot.components.server.ServerManager;
+import bot.tymebot.components.server.ServerManagerImpl;
 import bot.tymebot.components.status.DiscordStatusRunnable;
 import bot.tymebot.config.TymeConfig;
 import com.google.gson.Gson;
@@ -38,6 +40,9 @@ public class Bot extends DiscordBot {
     private final JDA jda;
     @Getter
     private TymeConfig config = null;
+
+    @Getter
+    private final ServerManager serverManager;
 
     @SneakyThrows
     public Bot() {
@@ -81,6 +86,7 @@ public class Bot extends DiscordBot {
 
         jda = builder.build().awaitReady();
         initializeCommands(jda);
+        serverManager = new ServerManagerImpl(this);
 
         // init config
         config.setDevIds(new String[]{"462296411141177364", "452520883194429440"});
