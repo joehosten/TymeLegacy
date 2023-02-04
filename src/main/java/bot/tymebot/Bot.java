@@ -5,10 +5,12 @@ import bot.tymebot.components.admin.CommandListUsers;
 import bot.tymebot.components.admin.CommandReload;
 import bot.tymebot.components.guild.ServerJoinListener;
 import bot.tymebot.components.misc.CommandInfo;
+import bot.tymebot.components.status.DiscordStatusRunnable;
 import bot.tymebot.config.TymeConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import games.negative.framework.discord.DiscordBot;
+import games.negative.framework.discord.runnable.Scheduler;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.JDA;
@@ -84,6 +86,9 @@ public class Bot extends DiscordBot {
         config.setDevIds(new String[]{"462296411141177364", "452520883194429440"});
         saveConfig(file, gson);
         devIds = config.getDevIds();
+
+        Scheduler scheduler = getScheduler();
+        scheduler.run(new DiscordStatusRunnable(this), 1000L, 1000L * config.getDiscordStatusInterval());
     }
 
     @SneakyThrows
