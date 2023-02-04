@@ -29,13 +29,13 @@ public class DiscordStatusRunnable implements RepeatingRunnable {
 
         DiscordStatus status = statuses.get(count);
 
-        String text = status.text();
+        String text = status.getText();
         String formatted = new TextBuilder(text)
                 .replace("%users%", Utils.decimalFormat(jda.getUsers().size()))
                 .replace("%guilds%", Utils.decimalFormat(jda.getGuilds().size())).build();
 
         Presence presence = jda.getPresence();
-        presence.setActivity(Activity.of(status.type(), formatted));
+        presence.setActivity(Activity.of(status.getType(), formatted));
 
         count++;
 
