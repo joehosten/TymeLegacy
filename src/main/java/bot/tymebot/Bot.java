@@ -4,6 +4,7 @@ import bot.tymebot.components.admin.CommandListGuilds;
 import bot.tymebot.components.admin.CommandListUsers;
 import bot.tymebot.components.admin.CommandReload;
 import bot.tymebot.components.guild.ServerJoinListener;
+import bot.tymebot.components.guild.ServerLeaveListener;
 import bot.tymebot.components.misc.CommandInfo;
 import bot.tymebot.components.server.ServerManager;
 import bot.tymebot.components.server.ServerManagerImpl;
@@ -82,7 +83,10 @@ public class Bot extends DiscordBot {
             registerServerCommand(parentServer, new CommandReload(this));
         }
         // listeners
-        builder.addEventListeners(new ServerJoinListener());
+        builder.addEventListeners(
+                new ServerJoinListener(this),
+                new ServerLeaveListener(this)
+        );
 
         jda = builder.build().awaitReady();
         initializeCommands(jda);
