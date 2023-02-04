@@ -2,6 +2,7 @@ package bot.tymebot;
 
 import bot.tymebot.components.admin.CommandListGuilds;
 import bot.tymebot.components.admin.CommandListUsers;
+import bot.tymebot.components.admin.CommandReload;
 import bot.tymebot.components.guild.ServerJoinListener;
 import bot.tymebot.components.misc.CommandInfo;
 import bot.tymebot.config.TymeConfig;
@@ -69,6 +70,10 @@ public class Bot extends DiscordBot {
         registerGlobalCommand(new CommandInfo());
         registerGlobalCommand(new CommandListUsers());
 
+        String parentServer = config.getParentServer();
+        if (parentServer != null) {
+            registerServerCommand(parentServer, new CommandReload(this));
+        }
         // listeners
         builder.addEventListeners(new ServerJoinListener());
 
