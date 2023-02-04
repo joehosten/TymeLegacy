@@ -2,12 +2,18 @@ package bot.tymebot;
 
 import bot.tymebot.components.admin.CommandListGuilds;
 import bot.tymebot.components.admin.CommandListUsers;
+import bot.tymebot.components.admin.CommandReload;
 import bot.tymebot.components.guild.ServerJoinListener;
+import bot.tymebot.components.guild.ServerLeaveListener;
 import bot.tymebot.components.misc.CommandInfo;
+import bot.tymebot.components.server.ServerManager;
+import bot.tymebot.components.server.ServerManagerImpl;
+import bot.tymebot.components.status.DiscordStatusRunnable;
 import bot.tymebot.config.TymeConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import games.negative.framework.discord.DiscordBot;
+import games.negative.framework.discord.runnable.Scheduler;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.JDA;
@@ -35,6 +41,9 @@ public class Bot extends DiscordBot {
     private final JDA jda;
     @Getter
     private TymeConfig config = null;
+
+    @Getter
+    private final ServerManager serverManager;
 
     @SneakyThrows
     public Bot() {
@@ -69,16 +78,27 @@ public class Bot extends DiscordBot {
         registerGlobalCommand(new CommandInfo());
         registerGlobalCommand(new CommandListUsers());
 
+        String parentServer = config.getParentServer();
+        if (parentServer != null) {
+            registerServerCommand(parentServer, new CommandReload(this));
+        }
         // listeners
-        builder.addEventListeners(new ServerJoinListener());
+        builder.addEventListeners(
+                new ServerJoinListener(this),
+                new ServerLeaveListener(this)
+        );
 
         jda = builder.build().awaitReady();
         initializeCommands(jda);
+        serverManager = new ServerManagerImpl(this);
 
         // init config
         config.setDevIds(new String[]{"462296411141177364", "452520883194429440"});
         saveConfig(file, gson);
         devIds = config.getDevIds();
+
+        Scheduler scheduler = getScheduler();
+        scheduler.run(new DiscordStatusRunnable(this), 1000L, 1000L * config.getDiscordStatusInterval());
     }
 
     @SneakyThrows
