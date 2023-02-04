@@ -67,7 +67,7 @@
         <dependency>
             <groupId>games.negative.framework</groupId>
             <artifactId>discord-framework</artifactId>
-            <version>1.0.0-ALPHA-4</version>
+            <version>1.0.0-ALPHA-6</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
