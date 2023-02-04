@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import games.negative.framework.discord.runnable.RepeatingRunnable;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +20,18 @@ public class ServerManagerImpl implements ServerManager {
 
     public ServerManagerImpl(Bot bot) {
         this.servers = loadServers();
+
+        // If the bot was offline, and it had joined some servers,
+        // we need to make sure we account for that, so we are going to cycle
+        // through all current servers in JDA's cache and ensure they are all valid servers
+        // in our server data cache
+        JDA jda = bot.getJda();
+        for (Guild guild : jda.getGuilds()) {
+            if (servers.containsKey(guild.getId())) continue;
+
+            addServer(guild);
+        }
+
         this.autoSave = bot.getScheduler().run(new DiscordServerSaveRunnable(), 1000L * 15, 1000L * 60 * 30);
     }
 
