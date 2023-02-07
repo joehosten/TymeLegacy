@@ -14,8 +14,4 @@ public interface DiscordServer {
     }
 
     long getJoinDate();
-
-    boolean isBlacklisted();
-
-    void setBlacklisted(boolean blacklisted);
 }

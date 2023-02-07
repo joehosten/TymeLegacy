@@ -4,6 +4,7 @@ import bot.tymebot.components.admin.CommandListGuilds;
 import bot.tymebot.components.admin.CommandListUsers;
 import bot.tymebot.components.admin.CommandLogout;
 import bot.tymebot.components.admin.CommandReload;
+import bot.tymebot.components.admin.blacklist.CommandBlacklist;
 import bot.tymebot.components.guild.ServerJoinListener;
 import bot.tymebot.components.guild.ServerLeaveListener;
 import bot.tymebot.components.misc.CommandInfo;
@@ -86,6 +87,7 @@ public class Bot extends DiscordBot {
         if (parentServer != null) {
             registerServerCommand(parentServer, new CommandReload(this));
             registerServerCommand(parentServer, new CommandLogout(this));
+            registerServerCommand(parentServer, new CommandBlacklist(this));
         }
 
         // listeners
@@ -126,7 +128,9 @@ public class Bot extends DiscordBot {
         }
     }
 
-    public boolean isBlacklisted(String userId, String guildId) {
+    public boolean isLimited(String userId, String guildId) {
+        // check if bot in maintenance
+
 
         // check if user is blacklisted
         if (config.getBlacklistedUserIds() != null) {
@@ -138,10 +142,9 @@ public class Bot extends DiscordBot {
 
         // if user is not blacklisted, then check if the guild is blacklisted
         Guild guild = jda.getGuildById(guildId);
-        if (guild != null) {
+        if (guild != null && config.getBlacklistedUserIds() != null) {
             System.out.println(2);
-            System.out.println(serverManager.getServer(guild));
-            return Objects.requireNonNull(serverManager.getServer(guildId)).isBlacklisted();
+            return Arrays.asList(config.getBlacklistedGuildIds()).contains(guildId);
         }
 
         return false;
@@ -159,7 +162,6 @@ public class Bot extends DiscordBot {
         @Override
         public void execute() {
             System.out.println("Caching configuration and servers..");
-            Bot.getInstance().getServerManager().reCacheServers();
             Bot.getInstance().reloadConfig();
         }
     }

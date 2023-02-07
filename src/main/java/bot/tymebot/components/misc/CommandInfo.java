@@ -19,7 +19,7 @@ public class CommandInfo extends SlashCommand {
     @Override
     public void onCommand(SlashCommandInteractionEvent slashCommandInteractionEvent) {
         System.out.println(slashCommandInteractionEvent.getUser().getId() + " - - " + Objects.requireNonNull(slashCommandInteractionEvent.getGuild()).getId());
-        if (bot.isBlacklisted(slashCommandInteractionEvent.getUser().getId(), Objects.requireNonNull(slashCommandInteractionEvent.getGuild()).getId())) {
+        if (bot.isLimited(slashCommandInteractionEvent.getUser().getId(), Objects.requireNonNull(slashCommandInteractionEvent.getGuild()).getId())) {
             slashCommandInteractionEvent.reply("You are blacklisted from using Tyme!").setEphemeral(true).queue();
             return;
         }
@@ -27,7 +27,7 @@ public class CommandInfo extends SlashCommand {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Tyme Bot Info");
         eb.setDescription("""
-                This bot is made by the Discord.jar Team!
+                This bot is made by the Negative Games Team!
                 Uptime: `%uptime%`
                 Servers: `%totalguilds%`
                 """.replace("%uptime%", bot.getUptime()).replace("%totalguilds%", String.valueOf(slashCommandInteractionEvent.getJDA().getGuilds().size())));

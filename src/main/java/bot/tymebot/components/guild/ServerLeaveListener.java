@@ -22,6 +22,5 @@ public class ServerLeaveListener extends ListenerAdapter {
                 .replace("%guildid%", guild.getId()
                         .replace("%memberCount%", String.valueOf(guild.getMembers().size()))));
 
-        bot.getServerManager().removeServer(guild);
     }
 }

@@ -29,7 +29,6 @@ public class CommandLogout extends SlashCommand {
         }
         EXITING.set(true);
         slashCommandInteractionEvent.reply("Tyme is shutting down!").setEphemeral(true).queue();
-        bot.getServerManager().reCacheServers();
         bot.getJda().shutdown();
     }
 }

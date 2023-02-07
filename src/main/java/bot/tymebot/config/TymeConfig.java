@@ -20,6 +20,10 @@ public class TymeConfig {
     @SerializedName("parent-server-id")
     private String parentServer;
 
+    // Represents if the bot is in maintenance mode
+    @SerializedName("maintenance")
+    private boolean maintenanceMode;
+
     // Determines how long (in seconds) the current discord status
     // should show for before changing to the next one
     @SerializedName("discord-status-interval")

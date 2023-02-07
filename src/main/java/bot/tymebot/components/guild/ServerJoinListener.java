@@ -22,6 +22,9 @@ public class ServerJoinListener extends ListenerAdapter {
 
         System.out.println("Tyme has joined %guild% (%guildid%) - %memberCount% members.".replace("%guild%", guild.getName()).replace("%guildid%", guild.getId().replace("%memberCount%", String.valueOf(guild.getMembers().size()))));
 
+        if(bot.getServerManager().getServer(e.getGuild().getId()) != null) {
+            return;
+        }
         bot.getServerManager().addServer(guild);
     }
 }
