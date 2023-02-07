@@ -41,8 +41,8 @@ public class TymeConfig {
     private String[] devIds;
 
     @SerializedName("blacklistedUserIds")
-    private String[] blacklistedUserIds;
+    private String[] blacklistedUserIds = {"0"};
 
     @SerializedName("blacklistedGuildIds")
-    private String[] blacklistedGuildIds;
+    private String[] blacklistedGuildIds = {"0"};
 }
