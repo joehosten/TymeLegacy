@@ -12,18 +12,21 @@ import bot.tymebot.components.server.ServerManager;
 import bot.tymebot.components.server.ServerManagerImpl;
 import bot.tymebot.components.status.DiscordStatusRunnable;
 import bot.tymebot.config.TymeConfig;
+import bot.tymebot.core.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import games.negative.framework.discord.DiscordBot;
 import games.negative.framework.discord.runnable.RepeatingRunnable;
 import games.negative.framework.discord.runnable.Scheduler;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.io.File;
@@ -32,7 +35,6 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @Getter
 public class Bot extends DiscordBot {
@@ -128,34 +130,28 @@ public class Bot extends DiscordBot {
         }
     }
 
-    public boolean isLimited(String userId, String guildId) {
-        // check if bot in maintenance
+    public LimitedStatus isLimited(String userId, String guildId) {
+        // Check if bot is in maintenance mode
+        if (config.isMaintenanceMode()) return LimitedStatus.MAINTENANCE;
 
+        // Check if user is blacklisted
+        User user = jda.getUserById(userId);
+        if (user != null && config.getBlacklistedUserIds() != null &&
+                Arrays.asList(config.getBlacklistedUserIds()).contains(userId))
+            return LimitedStatus.USERBLACKLIST;
 
-        // check if user is blacklisted
-        if (config.getBlacklistedUserIds() != null) {
-            System.out.println(1);
-            System.out.println(Arrays.toString(config.getBlacklistedUserIds()));
-            return jda.getUserById(userId) != null &&
-                    Arrays.asList(config.getBlacklistedUserIds()).contains(userId);
-        }
-
-        // if user is not blacklisted, then check if the guild is blacklisted
+        // Check if guild is blacklisted
         Guild guild = jda.getGuildById(guildId);
-        if (guild != null && config.getBlacklistedUserIds() != null) {
-            System.out.println(2);
-            return Arrays.asList(config.getBlacklistedGuildIds()).contains(guildId);
-        }
+        if (guild != null && config.getBlacklistedGuildIds() != null &&
+                Arrays.asList(config.getBlacklistedGuildIds()).contains(guildId))
+            return LimitedStatus.GUILDBLACKLIST;
 
-        return false;
+        return LimitedStatus.NOT_LIMITED;
     }
 
     public String getUptime() {
-        long totalSeconds = (System.currentTimeMillis() - startTime) / 1000;
-        long seconds = totalSeconds % 60;
-        long minutes = (totalSeconds / 60) % 60;
-        long hours = (totalSeconds / 3600);
-        return (hours < 10 ? "0" + hours : hours) + "h " + (minutes < 10 ? "0" + minutes : minutes) + "m " + (seconds < 10 ? "0" + seconds : seconds) + "s";
+        long totalSeconds = System.currentTimeMillis() - startTime;
+        return Utils.makePrettyTime(totalSeconds);
     }
 
     private static class CacheDataRunnable implements RepeatingRunnable {
@@ -166,5 +162,14 @@ public class Bot extends DiscordBot {
         }
     }
 
+    @RequiredArgsConstructor
+    public enum LimitedStatus {
+        MAINTENANCE("Tyme is currently in maintenance mode. You cannot use this command."),
+        USERBLACKLIST("You are blacklisted from using Tyme. Please join the `/discord` for more information."),
+        GUILDBLACKLIST("This guild is blacklisted from using Tyme. Please ask a server administrator to join the `/discord` for more information."),
+        NOT_LIMITED(null);
+
+        public final String message;
+    }
 
 }

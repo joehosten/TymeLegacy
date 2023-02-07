@@ -18,19 +18,16 @@ public class CommandInfo extends SlashCommand {
 
     @Override
     public void onCommand(SlashCommandInteractionEvent slashCommandInteractionEvent) {
-        System.out.println(slashCommandInteractionEvent.getUser().getId() + " - - " + Objects.requireNonNull(slashCommandInteractionEvent.getGuild()).getId());
-        if (bot.isLimited(slashCommandInteractionEvent.getUser().getId(), Objects.requireNonNull(slashCommandInteractionEvent.getGuild()).getId())) {
-            slashCommandInteractionEvent.reply("You are blacklisted from using Tyme!").setEphemeral(true).queue();
+        Bot.LimitedStatus status = bot.isLimited(slashCommandInteractionEvent.getUser().getId(),
+                Objects.requireNonNull(slashCommandInteractionEvent.getGuild()).getId());
+        if (status != Bot.LimitedStatus.NOT_LIMITED) {
+            slashCommandInteractionEvent.reply(status.message).setEphemeral(true).queue();
             return;
         }
-
+        int totalGuilds = slashCommandInteractionEvent.getJDA().getGuilds().size();
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Tyme Bot Info");
-        eb.setDescription("""
-                This bot is made by the Negative Games Team!
-                Uptime: `%uptime%`
-                Servers: `%totalguilds%`
-                """.replace("%uptime%", bot.getUptime()).replace("%totalguilds%", String.valueOf(slashCommandInteractionEvent.getJDA().getGuilds().size())));
+        eb.setDescription("This bot is made by the Negative Games Team!\nUptime: `" + bot.getUptime() + "`\nServers: `" + totalGuilds + "`");
         eb.setThumbnail(slashCommandInteractionEvent.getJDA().getSelfUser().getAvatarUrl());
         slashCommandInteractionEvent.replyEmbeds(eb.build()).queue();
     }
