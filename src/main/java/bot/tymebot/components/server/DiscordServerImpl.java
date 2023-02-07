@@ -12,9 +12,6 @@ public class DiscordServerImpl implements DiscordServer {
     @SerializedName("join-date")
     private final long joinDate;
 
-    @SerializedName("blacklisted")
-    private boolean blacklisted;
-
     @Override
     public String getServerID() {
         return id;
@@ -23,15 +20,5 @@ public class DiscordServerImpl implements DiscordServer {
     @Override
     public long getJoinDate() {
         return joinDate;
-    }
-
-    @Override
-    public boolean isBlacklisted() {
-        return blacklisted;
-    }
-
-    @Override
-    public void setBlacklisted(boolean blacklisted) {
-        this.blacklisted = blacklisted;
     }
 }

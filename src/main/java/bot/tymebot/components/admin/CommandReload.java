@@ -33,7 +33,6 @@ public class CommandReload extends SlashCommand {
         long start = System.currentTimeMillis();
 
         bot.reloadConfig();
-        bot.getServerManager().reCacheServers();
 
         long end = System.currentTimeMillis();
 

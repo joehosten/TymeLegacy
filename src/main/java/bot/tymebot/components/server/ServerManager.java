@@ -25,5 +25,4 @@ public interface ServerManager {
         removeServer(guild.getId());
     }
 
-    void reCacheServers();
 }
