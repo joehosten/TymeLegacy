@@ -10,11 +10,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import java.util.ArrayList;
 import java.util.Objects;
 
-@SlashInfo(name = "guild", description = "Blacklist a guild ID.")
-public class SubCommandBlacklistGuild extends SlashSubCommand {
+@SlashInfo(name = "guild", description = "Unblacklist a guild ID.")
+public class SubCommandUnBlacklistGuild extends SlashSubCommand {
     private Bot bot;
 
-    public SubCommandBlacklistGuild(Bot bot) {
+    public SubCommandUnBlacklistGuild(Bot bot) {
         this.bot = bot;
         setData(data -> {
             data.addOption(OptionType.STRING, "id", "The ID of the guild.", true);
@@ -34,9 +34,10 @@ public class SubCommandBlacklistGuild extends SlashSubCommand {
             return;
         }
         ArrayList<String> guilds = bot.getConfig().getBlacklistedGuildIds();
-        guilds.add(id);
+
+        guilds.remove(id);
+        slashCommandInteractionEvent.reply("Removed `%guild%` from the blacklist.".replace("%guild%", Objects.requireNonNull(bot.getJda().getGuildById(id)).getName())).setEphemeral(true).queue();
         bot.getConfig().setBlacklistedGuildIds(guilds);
         bot.saveConfig();
-        slashCommandInteractionEvent.reply("Added `%guild%` to the blacklist.".replace("%guild%", Objects.requireNonNull(bot.getJda().getGuildById(id)).getName())).setEphemeral(true).queue();
     }
 }

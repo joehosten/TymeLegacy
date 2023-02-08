@@ -2,9 +2,10 @@ package bot.tymebot;
 
 import bot.tymebot.components.admin.CommandListGuilds;
 import bot.tymebot.components.admin.CommandListUsers;
-import bot.tymebot.components.admin.CommandLogout;
+import bot.tymebot.components.admin.CommandMaintenance;
 import bot.tymebot.components.admin.CommandReload;
 import bot.tymebot.components.admin.blacklist.CommandBlacklist;
+import bot.tymebot.components.admin.blacklist.CommandUnBlacklist;
 import bot.tymebot.components.guild.ServerJoinListener;
 import bot.tymebot.components.guild.ServerLeaveListener;
 import bot.tymebot.components.misc.CommandInfo;
@@ -12,7 +13,7 @@ import bot.tymebot.components.server.ServerManager;
 import bot.tymebot.components.server.ServerManagerImpl;
 import bot.tymebot.components.status.DiscordStatusRunnable;
 import bot.tymebot.config.TymeConfig;
-import bot.tymebot.core.Utils;
+import bot.tymebot.core.util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import games.negative.framework.discord.DiscordBot;
@@ -27,13 +28,13 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.managers.Presence;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -49,6 +50,7 @@ public class Bot extends DiscordBot {
     private final JDA jda;
     @Getter
     private final ServerManager serverManager;
+    File file;
     @Getter
     private TymeConfig config = null;
 
@@ -57,19 +59,19 @@ public class Bot extends DiscordBot {
         instance = this;
 
         // Config loader
-        File file = new File("config", "main.json");
+        file = new File("config", "main.json");
         Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
         if (!file.exists()) {
             file.getParentFile().mkdir();
             file.createNewFile();
 
             this.config = new TymeConfig();
-            saveConfig(file, gson);
+            saveJson(file, gson);
         }
 
         try (FileReader reader = new FileReader(file)) {
             config = gson.fromJson(reader, TymeConfig.class);
-            saveConfig(file, gson);
+            saveJson(file, gson);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -88,8 +90,9 @@ public class Bot extends DiscordBot {
         String parentServer = config.getParentServer();
         if (parentServer != null) {
             registerServerCommand(parentServer, new CommandReload(this));
-            registerServerCommand(parentServer, new CommandLogout(this));
             registerServerCommand(parentServer, new CommandBlacklist(this));
+            registerServerCommand(parentServer, new CommandUnBlacklist(this));
+            registerServerCommand(parentServer, new CommandMaintenance(this));
         }
 
         // listeners
@@ -99,9 +102,20 @@ public class Bot extends DiscordBot {
         initializeCommands(jda);
         serverManager = new ServerManagerImpl(this);
 
+        // will change this when mongo is connected. If config value is set to "TymeBeta" etc, it will load the correct database
+        // and status correctly.
+        Presence presence = jda.getPresence();
+        switch (getJda().getSelfUser().getName()) {
+            case "TymeBeta" -> presence.setStatus(OnlineStatus.DO_NOT_DISTURB);
+            case "Tyme" -> presence.setStatus(OnlineStatus.ONLINE);
+            case "TymeCanary" -> presence.setStatus(OnlineStatus.IDLE);
+            default -> throw new IllegalStateException("Unexpected value: " + getJda().getSelfUser().getName());
+        }
+
+
         // init config
         config.setDevIds(new String[]{"462296411141177364", "452520883194429440"});
-        saveConfig(file, gson);
+        saveJson(file, gson);
         devIds = config.getDevIds();
 
         Scheduler scheduler = getScheduler();
@@ -110,8 +124,17 @@ public class Bot extends DiscordBot {
     }
 
     @SneakyThrows
-    private void saveConfig(File file, Gson gson) {
+    private void saveJson(File file, Gson gson) {
         Writer writer = new FileWriter(file, false);
+        gson.toJson(this.config, writer);
+        writer.flush();
+        writer.close();
+    }
+
+    @SneakyThrows
+    public void saveConfig() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+        Writer writer = new FileWriter(new File("config", "main.json"), false);
         gson.toJson(this.config, writer);
         writer.flush();
         writer.close();
@@ -136,14 +159,13 @@ public class Bot extends DiscordBot {
 
         // Check if user is blacklisted
         User user = jda.getUserById(userId);
-        if (user != null && config.getBlacklistedUserIds() != null &&
-                Arrays.asList(config.getBlacklistedUserIds()).contains(userId))
+        if ((user != null) && (config.getBlacklistedUserIds() != null) &&
+                config.getBlacklistedUserIds().contains(userId))
             return LimitedStatus.USERBLACKLIST;
 
         // Check if guild is blacklisted
         Guild guild = jda.getGuildById(guildId);
-        if (guild != null && config.getBlacklistedGuildIds() != null &&
-                Arrays.asList(config.getBlacklistedGuildIds()).contains(guildId))
+        if ((guild != null) && (config.getBlacklistedGuildIds() != null) && config.getBlacklistedGuildIds().contains(guildId))
             return LimitedStatus.GUILDBLACKLIST;
 
         return LimitedStatus.NOT_LIMITED;
@@ -154,14 +176,6 @@ public class Bot extends DiscordBot {
         return Utils.makePrettyTime(totalSeconds);
     }
 
-    private static class CacheDataRunnable implements RepeatingRunnable {
-        @Override
-        public void execute() {
-            System.out.println("Caching configuration and servers..");
-            Bot.getInstance().reloadConfig();
-        }
-    }
-
     @RequiredArgsConstructor
     public enum LimitedStatus {
         MAINTENANCE("Tyme is currently in maintenance mode. You cannot use this command."),
@@ -170,6 +184,14 @@ public class Bot extends DiscordBot {
         NOT_LIMITED(null);
 
         public final String message;
+    }
+
+    private static class CacheDataRunnable implements RepeatingRunnable {
+        @Override
+        public void execute() {
+            System.out.println("Caching configuration and servers..");
+            Bot.getInstance().reloadConfig();
+        }
     }
 
 }

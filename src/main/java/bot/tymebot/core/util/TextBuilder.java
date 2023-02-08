@@ -1,4 +1,4 @@
-package bot.tymebot.core;
+package bot.tymebot.core.util;
 
 public class TextBuilder {
 

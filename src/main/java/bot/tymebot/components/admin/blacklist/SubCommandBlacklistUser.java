@@ -10,14 +10,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import java.util.ArrayList;
 import java.util.Objects;
 
-@SlashInfo(name = "guild", description = "Blacklist a guild ID.")
-public class SubCommandBlacklistGuild extends SlashSubCommand {
+@SlashInfo(name = "user", description = "Blacklist a user ID.")
+public class SubCommandBlacklistUser extends SlashSubCommand {
     private Bot bot;
 
-    public SubCommandBlacklistGuild(Bot bot) {
+    public SubCommandBlacklistUser(Bot bot) {
         this.bot = bot;
         setData(data -> {
-            data.addOption(OptionType.STRING, "id", "The ID of the guild.", true);
+            data.addOption(OptionType.STRING, "id", "The ID of the user.", true);
         });
     }
 
@@ -29,14 +29,14 @@ public class SubCommandBlacklistGuild extends SlashSubCommand {
         }
 
         String id = Objects.requireNonNull(slashCommandInteractionEvent.getOption("id")).getAsString();
-        if (bot.getJda().getGuildById(id) == null) {
+        if (bot.getJda().getUserById(id) == null) {
             slashCommandInteractionEvent.reply("This is not cached by Tyme's JDA.").setEphemeral(true).queue();
             return;
         }
-        ArrayList<String> guilds = bot.getConfig().getBlacklistedGuildIds();
+        ArrayList<String> guilds = bot.getConfig().getBlacklistedUserIds();
         guilds.add(id);
-        bot.getConfig().setBlacklistedGuildIds(guilds);
+        bot.getConfig().setBlacklistedUserIds(guilds);
         bot.saveConfig();
-        slashCommandInteractionEvent.reply("Added `%guild%` to the blacklist.".replace("%guild%", Objects.requireNonNull(bot.getJda().getGuildById(id)).getName())).setEphemeral(true).queue();
+        slashCommandInteractionEvent.reply("Added `%user%` to the blacklist.".replace("%user%", Objects.requireNonNull(bot.getJda().getUserById(id)).getName())).setEphemeral(true).queue();
     }
 }
