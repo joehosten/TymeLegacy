@@ -1,6 +1,6 @@
 package bot.tymebot.components.admin;
 
-import bot.tymebot.core.UtilsUser;
+import bot.tymebot.core.util.UtilsUser;
 import games.negative.framework.discord.command.SlashCommand;
 import games.negative.framework.discord.command.SlashInfo;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

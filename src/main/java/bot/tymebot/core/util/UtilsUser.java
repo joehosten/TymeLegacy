@@ -1,4 +1,4 @@
-package bot.tymebot.core;
+package bot.tymebot.core.util;
 
 import bot.tymebot.Bot;
 import lombok.experimental.UtilityClass;

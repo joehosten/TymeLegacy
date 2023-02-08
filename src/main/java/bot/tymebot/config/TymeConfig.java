@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Activity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -41,8 +42,8 @@ public class TymeConfig {
     private String[] devIds;
 
     @SerializedName("blacklistedUserIds")
-    private String[] blacklistedUserIds = {"0"};
+    private ArrayList<String> blacklistedUserIds = new ArrayList<>();
 
     @SerializedName("blacklistedGuildIds")
-    private String[] blacklistedGuildIds = {"0"};
+    private ArrayList<String> blacklistedGuildIds = new ArrayList<>();
 }

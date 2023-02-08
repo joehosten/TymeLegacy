@@ -26,11 +26,12 @@ public class CommandMaintenance extends SlashCommand {
         boolean configStatus = bot.getConfig().isMaintenanceMode();
 
         if (toggle == configStatus) {
-            slashCommandInteractionEvent.reply("The bot is already in maintenance mode!").setEphemeral(true).queue();
+            slashCommandInteractionEvent.reply("The bot is already " + (toggle ? "in" : "out off") + " maintenance mode!").setEphemeral(true).queue();
             return;
         }
 
         bot.getConfig().setMaintenanceMode(toggle);
-        bot.reloadConfig();
+        bot.saveConfig();
+        slashCommandInteractionEvent.reply("Tyme is now " + (toggle ? "in" : "out off") + " maintenance mode.").setEphemeral(true).queue();
     }
 }

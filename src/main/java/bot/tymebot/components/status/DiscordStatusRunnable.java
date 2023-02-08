@@ -2,8 +2,8 @@ package bot.tymebot.components.status;
 
 import bot.tymebot.Bot;
 import bot.tymebot.config.TymeConfig;
-import bot.tymebot.core.TextBuilder;
-import bot.tymebot.core.Utils;
+import bot.tymebot.core.util.TextBuilder;
+import bot.tymebot.core.util.Utils;
 import games.negative.framework.discord.runnable.RepeatingRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
@@ -36,6 +36,7 @@ public class DiscordStatusRunnable implements RepeatingRunnable {
 
         Presence presence = jda.getPresence();
         presence.setActivity(Activity.of(status.getType(), formatted));
+
 
         count++;
 
