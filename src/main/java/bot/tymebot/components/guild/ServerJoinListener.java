@@ -20,7 +20,7 @@ public class ServerJoinListener extends ListenerAdapter {
         Guild guild = e.getGuild();
         Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessage("Thank you for inviting Tyme!");
 
-        System.out.println("Tyme has joined %guild% (%guildid%) - %memberCount% members.".replace("%guild%", guild.getName()).replace("%guildid%", guild.getId().replace("%memberCount%", String.valueOf(guild.getMembers().size()))));
+        System.out.println("Tyme has joined %guild% (%guildid%) - %memberCount% members.".replace("%guild%", guild.getName()).replace("%guildid%", guild.getId()).replace("%memberCount%", String.valueOf(guild.getMembers().size())));
 
         if (bot.getServerManager().getServer(e.getGuild().getId()) != null) {
             return;
