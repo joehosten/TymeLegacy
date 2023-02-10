@@ -98,7 +98,7 @@ public class Bot extends DiscordBot {
         }
 
         // listeners
-        builder.addEventListeners(new ServerJoinListener(this), new ServerLeaveListener(this));
+        builder.addEventListeners(new ServerJoinListener(this), new ServerLeaveListener());
 
         jda = builder.build().awaitReady();
         initializeCommands(jda);
