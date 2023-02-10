@@ -4,9 +4,11 @@ import bot.tymebot.Bot;
 import bot.tymebot.core.util.UtilsUser;
 import games.negative.framework.discord.command.SlashInfo;
 import games.negative.framework.discord.command.SlashSubCommand;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -36,8 +38,15 @@ public class SubCommandUnBlacklistUser extends SlashSubCommand {
         ArrayList<String> guilds = bot.getConfig().getBlacklistedUserIds();
 
         guilds.remove(id);
-        slashCommandInteractionEvent.reply("Removed `%user%` from the blacklist.".replace("%user%", Objects.requireNonNull(bot.getJda().getUserById(id)).getName())).setEphemeral(true).queue();
         bot.getConfig().setBlacklistedUserIds(guilds);
         bot.saveConfig();
+
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("You unblacklisted a user!");
+        eb.setDescription("You unblacklisted `%user%`\n\nThey now have access to the bot.".replace("%user%", Objects.requireNonNull(bot.getJda().getUserById(id)).getName()));
+        eb.setThumbnail(Objects.requireNonNull(bot.getJda().getUserById(id)).getAvatarUrl() == null ? null : Objects.requireNonNull(bot.getJda().getUserById(id)).getAvatarUrl());
+        eb.setFooter("Tyme Bot v" + bot.getVersion(), bot.getJda().getSelfUser().getAvatarUrl());
+        eb.setColor(Color.yellow);
+        slashCommandInteractionEvent.replyEmbeds(eb.build()).setEphemeral(true).queue();
     }
 }

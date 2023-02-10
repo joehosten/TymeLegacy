@@ -42,18 +42,16 @@ public class Utils {
 
         StringBuilder sb = new StringBuilder();
         if (days > 0) {
-            sb.append(days).append("d ");
+            sb.append(days).append("days ");
         }
         if (hours > 0 || sb.length() > 0) {
-            sb.append(hours).append("h ");
+            sb.append(hours).append("hours ");
         }
         if (minutes > 0 || sb.length() > 0) {
-            sb.append(minutes).append("m ");
+            sb.append(minutes).append("minutes ");
         }
-        sb.append(seconds).append("s");
+        sb.append(seconds).append("seconds");
 
         return sb.toString();
     }
-
-
 }

@@ -50,6 +50,8 @@ public class Bot extends DiscordBot {
     private final JDA jda;
     @Getter
     private final ServerManager serverManager;
+    @Getter
+    private final String version = "1.0";
     File file;
     @Getter
     private TymeConfig config = null;

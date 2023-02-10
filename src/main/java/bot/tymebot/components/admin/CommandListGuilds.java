@@ -17,5 +17,6 @@ public class CommandListGuilds extends SlashCommand {
         int guilds = slashCommandInteractionEvent.getJDA().getGuilds().size();
         slashCommandInteractionEvent.reply("I am in " + guilds + (guilds == 1 ? " guild." : " guilds.")).setEphemeral(true).queue();
 
+
     }
 }
