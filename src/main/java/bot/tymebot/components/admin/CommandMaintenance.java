@@ -3,9 +3,11 @@ package bot.tymebot.components.admin;
 import bot.tymebot.Bot;
 import games.negative.framework.discord.command.SlashCommand;
 import games.negative.framework.discord.command.SlashInfo;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
+import java.awt.*;
 import java.util.Objects;
 
 @SlashInfo(name = "maintenance", description = "Put the bot into maintenance mode. ")
@@ -32,6 +34,11 @@ public class CommandMaintenance extends SlashCommand {
 
         bot.getConfig().setMaintenanceMode(toggle);
         bot.saveConfig();
-        slashCommandInteractionEvent.reply("Tyme is now " + (toggle ? "in" : "out off") + " maintenance mode.").setEphemeral(true).queue();
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("Maintenance mode " + (toggle ? "on" : "off"));
+        eb.setDescription("You have put Tyme " + (toggle ? "into" : "out of") + " maintenance mode.");
+        eb.setColor(toggle ? Color.orange : Color.green);
+        eb.setFooter("Tyme Bot v" + bot.getVersion(), bot.getJda().getSelfUser().getAvatarUrl());
+        slashCommandInteractionEvent.replyEmbeds(eb.build()).setEphemeral(true).queue();
     }
 }

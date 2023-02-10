@@ -4,9 +4,11 @@ import bot.tymebot.Bot;
 import bot.tymebot.core.util.UtilsUser;
 import games.negative.framework.discord.command.SlashInfo;
 import games.negative.framework.discord.command.SlashSubCommand;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -37,6 +39,13 @@ public class SubCommandBlacklistGuild extends SlashSubCommand {
         guilds.add(id);
         bot.getConfig().setBlacklistedGuildIds(guilds);
         bot.saveConfig();
-        slashCommandInteractionEvent.reply("Added `%guild%` to the blacklist.".replace("%guild%", Objects.requireNonNull(bot.getJda().getGuildById(id)).getName())).setEphemeral(true).queue();
+
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("You blacklisted a guild!");
+        eb.setDescription("You blacklisted `%guild%`\n\nThey will not be able to commands or interact with the bot.".replace("%guild%", Objects.requireNonNull(bot.getJda().getGuildById(id)).getName()));
+        eb.setThumbnail(Objects.requireNonNull(bot.getJda().getGuildById(id)).getIconUrl() == null ? null : Objects.requireNonNull(bot.getJda().getGuildById(id)).getIconUrl());
+        eb.setFooter("Tyme Bot v" + bot.getVersion(), bot.getJda().getSelfUser().getAvatarUrl());
+        eb.setColor(Color.orange);
+        slashCommandInteractionEvent.replyEmbeds(eb.build()).setEphemeral(true).queue();
     }
 }

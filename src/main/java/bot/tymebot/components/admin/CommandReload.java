@@ -3,6 +3,7 @@ package bot.tymebot.components.admin;
 import bot.tymebot.Bot;
 import games.negative.framework.discord.command.SlashCommand;
 import games.negative.framework.discord.command.SlashInfo;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -37,7 +38,10 @@ public class CommandReload extends SlashCommand {
         long end = System.currentTimeMillis();
 
         long diff = Math.abs(end - start);
-        event.reply("Reloaded bot configuration & servers in " + diff + "ms.")
-                .setEphemeral(true).queue();
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("Successfully reloaded Tyme");
+        eb.setDescription("Tyme reloaded in " + diff + " ms.");
+        eb.setFooter("Tyme Bot v" + bot.getVersion(), bot.getJda().getSelfUser().getAvatarUrl());
+        event.replyEmbeds(eb.build()).setEphemeral(true).queue();
     }
 }
