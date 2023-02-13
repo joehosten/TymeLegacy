@@ -46,4 +46,7 @@ public class TymeConfig {
 
     @SerializedName("blacklistedGuildIds")
     private ArrayList<String> blacklistedGuildIds = new ArrayList<>();
+
+    @SerializedName("database.password")
+    private String password = "changeme";
 }

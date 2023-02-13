@@ -1,6 +1,5 @@
 package bot.tymebot.components.guild;
 
-import bot.tymebot.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -14,7 +13,7 @@ public class ServerLeaveListener extends ListenerAdapter {
         System.out.println("Tyme has left %guild% (%guildid%) - %memberCount% members."
                 .replace("%guild%", guild.getName())
                 .replace("%guildid%", guild.getId())
-                        .replace("%memberCount%", String.valueOf(guild.getMembers().size())));
+                .replace("%memberCount%", String.valueOf(guild.getMembers().size())));
 
     }
 }

@@ -8,7 +8,11 @@ import bot.tymebot.components.admin.blacklist.CommandBlacklist;
 import bot.tymebot.components.admin.blacklist.CommandUnBlacklist;
 import bot.tymebot.components.guild.ServerJoinListener;
 import bot.tymebot.components.guild.ServerLeaveListener;
+import bot.tymebot.components.misc.BotMentionListener;
+import bot.tymebot.components.misc.CommandDiscord;
 import bot.tymebot.components.misc.CommandInfo;
+import bot.tymebot.components.misc.CommandInvite;
+import bot.tymebot.components.misc.help.CommandHelp;
 import bot.tymebot.components.server.ServerManager;
 import bot.tymebot.components.server.ServerManagerImpl;
 import bot.tymebot.components.status.DiscordStatusRunnable;
@@ -16,6 +20,10 @@ import bot.tymebot.config.TymeConfig;
 import bot.tymebot.core.util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.seailz.databaseapi.Column;
+import com.seailz.databaseapi.ColumnType;
+import com.seailz.databaseapi.Database;
+import com.seailz.databaseapi.annotation.builder.TableBuilder;
 import games.negative.framework.discord.DiscordBot;
 import games.negative.framework.discord.runnable.RepeatingRunnable;
 import games.negative.framework.discord.runnable.Scheduler;
@@ -35,6 +43,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -52,7 +62,10 @@ public class Bot extends DiscordBot {
     private final ServerManager serverManager;
     @Getter
     private final String version = "1.0";
+    private final String databasePassword;
     File file;
+    @Getter
+    Database database;
     @Getter
     private TymeConfig config = null;
 
@@ -88,6 +101,9 @@ public class Bot extends DiscordBot {
         registerGlobalCommand(new CommandListGuilds());
         registerGlobalCommand(new CommandInfo(this));
         registerGlobalCommand(new CommandListUsers());
+        registerGlobalCommand(new CommandHelp(this));
+        registerGlobalCommand(new CommandDiscord());
+        registerGlobalCommand(new CommandInvite());
 
         String parentServer = config.getParentServer();
         if (parentServer != null) {
@@ -98,7 +114,7 @@ public class Bot extends DiscordBot {
         }
 
         // listeners
-        builder.addEventListeners(new ServerJoinListener(this), new ServerLeaveListener());
+        builder.addEventListeners(new ServerJoinListener(this), new ServerLeaveListener(), new BotMentionListener(this));
 
         jda = builder.build().awaitReady();
         initializeCommands(jda);
@@ -119,6 +135,10 @@ public class Bot extends DiscordBot {
         config.setDevIds(new String[]{"462296411141177364", "452520883194429440"});
         saveJson(file, gson);
         devIds = config.getDevIds();
+        databasePassword = config.getPassword();
+
+        // database init
+        buildDatabase();
 
         Scheduler scheduler = getScheduler();
         scheduler.run(new DiscordStatusRunnable(this), 1000L, 1000L * config.getDiscordStatusInterval());
@@ -161,8 +181,7 @@ public class Bot extends DiscordBot {
 
         // Check if user is blacklisted
         User user = jda.getUserById(userId);
-        if ((user != null) && (config.getBlacklistedUserIds() != null) &&
-                config.getBlacklistedUserIds().contains(userId))
+        if ((user != null) && (config.getBlacklistedUserIds() != null) && config.getBlacklistedUserIds().contains(userId))
             return LimitedStatus.USERBLACKLIST;
 
         // Check if guild is blacklisted
@@ -178,12 +197,47 @@ public class Bot extends DiscordBot {
         return Utils.makePrettyTime(totalSeconds);
     }
 
+    private void buildDatabase() {
+        database = new Database("jp.hypews.com", 3306, "u63_HCPw9nc4dx", databasePassword, "s63_tymebeta");
+        database.connect();
+
+        // Users table
+        try {
+            if (!database.tableExists("users")) {
+                // create the columns
+                List<Column> columns = new ArrayList<>();
+                Column id = new Column(ColumnType.VARCHAR, "id");
+                Column balance = new Column(ColumnType.INT, "balance");
+                Column tokens = new Column(ColumnType.INT, "tokens");
+                Column job = new Column(ColumnType.VARCHAR, "job");
+                Column titles = new Column(ColumnType.VARCHAR, "titles");
+                columns.add(id);
+                columns.add(balance);
+                columns.add(tokens);
+                columns.add(job);
+                columns.add(titles);
+
+                // create the table based on the columns
+                TableBuilder userTableBuilder = new TableBuilder("users", columns);
+                try {
+                    database.createTable(userTableBuilder);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Jobs table
+        // Eco table
+        // Titles table
+        // Inventories table
+    }
+
     @RequiredArgsConstructor
     public enum LimitedStatus {
-        MAINTENANCE("Tyme is currently in maintenance mode. You cannot use this command."),
-        USERBLACKLIST("You are blacklisted from using Tyme. Please join the `/discord` for more information."),
-        GUILDBLACKLIST("This guild is blacklisted from using Tyme. Please ask a server administrator to join the `/discord` for more information."),
-        NOT_LIMITED(null);
+        MAINTENANCE("Tyme is currently in maintenance mode. You cannot use this command."), USERBLACKLIST("You are blacklisted from using Tyme. Please join the `/discord` for more information."), GUILDBLACKLIST("This guild is blacklisted from using Tyme. Please ask a server administrator to join the `/discord` for more information."), NOT_LIMITED(null);
 
         public final String message;
     }
