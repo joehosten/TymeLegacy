@@ -12,4 +12,8 @@ public class UtilsUser {
         return Arrays.stream(Bot.getDevIds()).toList().contains(id);
     }
 
+    public void initUser(String id) {
+
+    }
+
 }
