@@ -42,15 +42,15 @@ public class Utils {
 
         StringBuilder sb = new StringBuilder();
         if (days > 0) {
-            sb.append(days).append("days ");
+            sb.append(days).append(days > 1 ? " days " : " day ");
         }
         if (hours > 0 || sb.length() > 0) {
-            sb.append(hours).append("hours ");
+            sb.append(hours).append(hours > 1 ? " hours " : " hour ");
         }
         if (minutes > 0 || sb.length() > 0) {
-            sb.append(minutes).append("minutes ");
+            sb.append(minutes).append(minutes > 1 ? " minutes " : " minute ");
         }
-        sb.append(seconds).append("seconds");
+        sb.append(seconds).append(seconds > 1 ? " seconds" : " second");
 
         return sb.toString();
     }
