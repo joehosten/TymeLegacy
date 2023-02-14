@@ -85,7 +85,7 @@ public class Bot extends DiscordBot {
         builder.setActivity(Activity.watching("over the server!"));
 
         // commands
-        registerGlobalCommand(new CommandListGuilds());
+        registerGlobalCommand(new CommandListGuilds(this));
         registerGlobalCommand(new CommandInfo(this));
         registerGlobalCommand(new CommandListUsers());
 
